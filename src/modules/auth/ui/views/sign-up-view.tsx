@@ -10,8 +10,10 @@ import { useForm } from "react-hook-form";
 import { OctagonAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { FaGoogle, FaGithub } from "react-icons/fa";
+
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -45,16 +47,37 @@ export const SignUpView = () => {
             name: data.name,
             email: data.email,
             password: data.password,
+            callbackURL: "/",
         },
             {
                 onError: ({ error }) => {
                     setError(error.message);
+                    setLoading(false);
                 },
                 onSuccess: () => {
+                    setLoading(false);
                     router.push("/");
                 }
             });
-        setLoading(false);
+    }
+
+    const onSocial = async (provider: "github" | "google") => {
+        setLoading(true);
+        setError(null);
+        const { error } = await authClient.signIn.social({
+            provider: provider,
+            callbackURL: "/",
+        },
+            {
+                onError: ({ error }) => {
+                    setError(error.message);
+                    setLoading(false);
+
+                },
+                onSuccess: () => {
+                    setLoading(false);
+                }
+            });
     }
 
     return (
@@ -139,14 +162,13 @@ export const SignUpView = () => {
                                     </span>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <Button type="button" variant="outline" className="w-full" disabled={loading}>
-                                        {/* <img src="/google.svg" alt="Google Logo" className="w-4 h-4 mr-2" /> */}
+                                    <Button type="button" variant="outline" className="w-full" disabled={loading} onClick={() => onSocial("google")}>
+                                        <FaGoogle className="inline mr-2" />
                                         Google
                                     </Button>
-                                    <Button type="button" variant="outline" className="w-full" disabled={loading} >
-                                        {/* <img src="/github.svg" alt="GitHub Logo" className="w-4 h-4 mr-2" /> */}
-                                        GitHub
-                                    </Button>
+                                    <Button type="button" variant="outline" className="w-full" disabled={loading} onClick={() => onSocial("github")} >
+                                        <FaGithub className="inline mr-2" />
+                                        Github</Button>
                                 </div>
                                 <div className="text-sm text-center">
                                     Already have a account?{" "}
@@ -161,14 +183,14 @@ export const SignUpView = () => {
                         <div>
                             <span>
                                 <svg width="51" height="40" viewBox="0 0 51 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12.446 0L22.7801 8.82887C23.3936 9.35302 23.7473 10.1222 23.7473 10.9323V17.5862L13.4131 8.75734C12.7996 8.23319 12.446 7.464 12.446 6.65386V0Z" fill="#7B19D8"></path>
-                                    <path d="M12.446 40L22.7801 31.1711C23.3936 30.647 23.7473 29.8778 23.7473 29.0677V22.4138L13.4131 31.2427C12.7996 31.7668 12.446 32.536 12.446 33.3461V40Z" fill="#7B19D8"></path>
-                                    <path d="M0.117188 9.31034L10.3108 17.9705C10.805 18.3904 11.4308 18.6207 12.0775 18.6207H20.2982L10.1297 9.96253C9.63514 9.54141 9.00837 9.31034 8.36065 9.31034H0.117188Z" fill="#7B19D8"></path>
-                                    <path d="M0.117188 30.6897L10.2481 22.0345C10.7432 21.6115 11.3713 21.3793 12.0206 21.3793H20.3227L10.1291 30.0394C9.63487 30.4593 9.00904 30.6897 8.36236 30.6897H0.117188Z" fill="#7B19D8"></path>
-                                    <path d="M37.7884 0L27.4542 8.82887C26.8407 9.35302 26.4871 10.1222 26.4871 10.9323V17.5862L36.8212 8.75734C37.4347 8.23319 37.7884 7.464 37.7884 6.65386V0Z" fill="#7B19D8"></path>
-                                    <path d="M37.7884 40L27.4542 31.1711C26.8407 30.647 26.4871 29.8778 26.4871 29.0677V22.4138L36.8212 31.2427C37.4347 31.7668 37.7884 32.536 37.7884 33.3461V40Z" fill="#7B19D8"></path>
-                                    <path d="M50.1172 9.31034L39.9236 17.9705C39.4294 18.3904 38.8035 18.6207 38.1569 18.6207H29.9361L40.1047 9.96253C40.5992 9.54141 41.226 9.31034 41.8737 9.31034H50.1172Z" fill="#7B19D8"></path>
-                                    <path d="M50.1172 30.6897L39.9863 22.0345C39.4912 21.6115 38.863 21.3793 38.2137 21.3793H29.9117L40.1052 30.0394C40.5995 30.4593 41.2253 30.6897 41.872 30.6897H50.1172Z" fill="#7B19D8"></path>
+                                    <path d="M12.446 0L22.7801 8.82887C23.3936 9.35302 23.7473 10.1222 23.7473 10.9323V17.5862L13.4131 8.75734C12.7996 8.23319 12.446 7.464 12.446 6.65386V0Z" fill="#7CFC00"></path>
+                                    <path d="M12.446 40L22.7801 31.1711C23.3936 30.647 23.7473 29.8778 23.7473 29.0677V22.4138L13.4131 31.2427C12.7996 31.7668 12.446 32.536 12.446 33.3461V40Z" fill="#7CFC00"></path>
+                                    <path d="M0.117188 9.31034L10.3108 17.9705C10.805 18.3904 11.4308 18.6207 12.0775 18.6207H20.2982L10.1297 9.96253C9.63514 9.54141 9.00837 9.31034 8.36065 9.31034H0.117188Z" fill="#7CFC00"></path>
+                                    <path d="M0.117188 30.6897L10.2481 22.0345C10.7432 21.6115 11.3713 21.3793 12.0206 21.3793H20.3227L10.1291 30.0394C9.63487 30.4593 9.00904 30.6897 8.36236 30.6897H0.117188Z" fill="#7CFC00"></path>
+                                    <path d="M37.7884 0L27.4542 8.82887C26.8407 9.35302 26.4871 10.1222 26.4871 10.9323V17.5862L36.8212 8.75734C37.4347 8.23319 37.7884 7.464 37.7884 6.65386V0Z" fill="#7CFC00"></path>
+                                    <path d="M37.7884 40L27.4542 31.1711C26.8407 30.647 26.4871 29.8778 26.4871 29.0677V22.4138L36.8212 31.2427C37.4347 31.7668 37.7884 32.536 37.7884 33.3461V40Z" fill="#7CFC00"></path>
+                                    <path d="M50.1172 9.31034L39.9236 17.9705C39.4294 18.3904 38.8035 18.6207 38.1569 18.6207H29.9361L40.1047 9.96253C40.5992 9.54141 41.226 9.31034 41.8737 9.31034H50.1172Z" fill="#7CFC00"></path>
+                                    <path d="M50.1172 30.6897L39.9863 22.0345C39.4912 21.6115 38.863 21.3793 38.2137 21.3793H29.9117L40.1052 30.0394C40.5995 30.4593 41.2253 30.6897 41.872 30.6897H50.1172Z" fill="#7CFC00"></path>
                                 </svg>
                             </span>
                         </div>
