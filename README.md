@@ -37,3 +37,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 
 for avatar generate @dicebear/core @dicebear/collection
+npm i nanoid
