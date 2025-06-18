@@ -40,7 +40,7 @@ export const columns: ColumnDef<AgentGetOne>[] = [
             return (
                 <Badge variant="outline" className="flex items-center gap-x-2 [&>svg]:size-4">
                     <VideoIcon className="text-blue-700" />
-                    5 meetings
+                    {row.original.meetingCount || 0}{row.original.meetingCount === 1 ? " Meeting" : " Meetings"}
                 </Badge>
             )
         }

@@ -7,8 +7,14 @@ import {ErrorBoundary} from 'react-error-boundary';
 import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
+import type { SearchParams } from "nuqs";
+import { loadSearcParams } from "@/modules/agents/params";
 
-const Page = async() => {
+interface Props {
+    searchParams:Promise<SearchParams>
+}
+const Page = async({searchParams} : Props) => {
+    const filters = await loadSearcParams(searchParams);
     const session = await auth.api.getSession({
         headers: await headers(),
       });
@@ -16,7 +22,9 @@ const Page = async() => {
         redirect("/sign-in")
       }
     const queryClient = getQueryClient();
-    void queryClient.prefetchQuery(trpc.agents.getMany.queryOptions());
+    void queryClient.prefetchQuery(trpc.agents.getMany.queryOptions({
+        ...filters
+    }));
     return (
         <>
         <AgentsListHeader/>
