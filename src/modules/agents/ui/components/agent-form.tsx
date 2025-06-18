@@ -3,7 +3,7 @@ import { AgentGetOne } from "../../types";
 import { useRouter } from "next/navigation";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import agentInsertSchema from "../../schema";
+import {agentInsertSchema} from "../../schema";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -33,6 +33,26 @@ export const AgentForm = ({ onCancel, onSuccess, initialValues }: AgentFormProps
     const router = useRouter();
     const queryClient = useQueryClient();
 
+    const updateAgent = useMutation(
+        trpc.agents.update.mutationOptions({
+            onSuccess: async() => {
+                await queryClient.invalidateQueries(
+                    trpc.agents.getMany.queryOptions({}),
+                )
+                if (initialValues?.id) {
+                    await queryClient.invalidateQueries(
+                        trpc.agents.getOne.queryOptions({ id: initialValues.id }),
+                    );
+                }
+                onSuccess?.();
+            },
+            onError: (error) => {
+                toast.error(error.message)
+            },
+            
+        })
+    );
+
     const createAgent = useMutation(
         trpc.agents.create.mutationOptions({
             onSuccess: async() => {
@@ -61,11 +81,11 @@ export const AgentForm = ({ onCancel, onSuccess, initialValues }: AgentFormProps
     })
 
     const isEdit = !!initialValues;
-    const isPending = createAgent.isPending;
+    const isPending = createAgent.isPending || updateAgent.isPending;
 
     const onSubmit = async (data: z.infer<typeof agentInsertSchema>) => {
         if (isEdit) {
-            onSuccess();
+            updateAgent.mutate({...data, id: initialValues?.id });
         } else {
             await createAgent.mutate(data);
             onSuccess();
