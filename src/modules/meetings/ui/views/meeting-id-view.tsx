@@ -10,6 +10,10 @@ import { toast } from "sonner";
 import { MeetingIdViewHeader } from "../components/meeting-id-view-header";
 import { UpdateMeetingDialog } from "../components/update-meeting-dialog";
 import { useState } from "react";
+import UpcomingState from "../components/upcoming-state";
+import ActiveState from "../components/active-state";
+import CancelledState from "../components/cancelled-state";
+import ProcessingState from "../components/processing-state";
 
 
 interface Props {
@@ -51,6 +55,12 @@ export const MeetingIdView = ({ meetingId }: Props) => {
         }
     }
 
+    const isActive = data.status === "active";
+    const isUpcoming = data.status === "upcoming";
+    const isCompleted = data.status === "completed";
+    const isCancelled = data.status === "cancelled";
+    const isProcessing = data.status === "processing";
+
     return (
         <>
             <RemoveConfirmtion />
@@ -67,7 +77,19 @@ export const MeetingIdView = ({ meetingId }: Props) => {
                     onRemove={() => handleRemoveMeeting()}
                 />
 
-                {JSON.stringify(data, null, 2)}
+                {isCancelled && <CancelledState/>}
+                {isCompleted && <div>Completed</div>}
+                {isUpcoming && 
+                <UpcomingState
+                    meetingId={meetingId}
+                    onCancelMeeting={() => handleRemoveMeeting()}
+                    isCancelling={false} 
+                />}
+                {isActive && 
+                <ActiveState
+                    meetingId={meetingId}
+                />}
+                {isProcessing && <ProcessingState/>}
             </div>
         </>
     );
